@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; media-src data: blob:; base-uri 'none'; form-action 'none'">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weather Pocket</title>
+<style>
+:root{
+  --cream:#eef8ec;--paper:#fbfef9;--brown:#3f7a55;--brown-d:#24402e;--tan:#5f8f6f;
+  --line:#b2dbb9;--orange:#388e5e;--orange-d:#25683f;--green:#2e8b57;--blue:#3b82d6;
+  --card:#dff3e0;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;background:var(--cream);color:var(--brown-d);
+  font-family:system-ui,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.5;
+  background-image:radial-gradient(circle at 1px 1px,rgba(120,186,140,.35) 1px,transparent 1.5px);background-size:22px 22px;
+  transition:background-color .4s}
+body[data-w="sunny"]{--card:#ffe9b0}
+body[data-w="cloudy"]{--card:#e9eaee}
+body[data-w="rain"]{--card:#d8e9f8}
+body[data-w="cold"]{--card:#e2eefa}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.serif{font-family:Georgia,"Hiragino Mincho ProN","Yu Mincho",serif}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:960px;margin:0 auto;padding:16px 16px 8px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:44px;height:44px;border-radius:14px;background:#a9dfb5;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 10px rgba(63,122,85,.3)}
+.brand h1{margin:0;font-size:21px;color:var(--brown);line-height:1.1}
+.brand small{display:block;color:var(--tan);font-size:12px}
+.lang{display:flex;background:#d5eed9;border-radius:999px;padding:3px}
+.lang button{border:0;background:transparent;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;color:var(--brown)}
+.lang button[aria-pressed="true"]{background:var(--brown);color:#fff}
+main{max-width:960px;margin:0 auto;padding:8px 16px 40px;display:grid;gap:16px}
+@media(min-width:860px){main{grid-template-columns:360px 1fr;align-items:start}.side{position:sticky;top:12px}}
+h2{font-size:19px;color:var(--brown);margin:0 0 12px;border-bottom:3px dotted var(--line);padding-bottom:6px}
+.panel{background:var(--paper);border-radius:20px;padding:18px;box-shadow:0 4px 14px rgba(63,122,85,.12);border:2px solid #cfeacf}
+.date{color:var(--tan);font-size:13px;margin:0 0 4px}
+.wrow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.wbtn{background:#d5eed9;border:3px solid transparent;border-radius:14px;padding:8px 0;font-size:28px;line-height:1.2;transition:transform .15s,background .2s}
+.wbtn small{display:block;font-size:12px;color:var(--brown);font-weight:700;margin-top:2px}
+.wbtn:hover{transform:translateY(-2px)}
+.wbtn[aria-pressed="true"]{background:#a9dfb5;border-color:var(--brown);box-shadow:0 3px 8px rgba(63,122,85,.25)}
+.wcard{display:flex;align-items:center;gap:14px;background:var(--card);border-radius:16px;padding:14px;transition:background .4s}
+.wcard .big{font-size:50px;line-height:1;animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-5px)}}
+.wcard b{font-size:18px;display:block}
+.wcard span.meta{font-size:13px;color:#4a5f50}
+.tip{margin:12px 0 0;font-size:14px;color:var(--brown);background:#f1faee;border-radius:12px;padding:10px 12px;border:2px dashed var(--line)}
+.prog{margin-top:14px}
+.prog .top{display:flex;justify-content:space-between;font-weight:700;font-size:15px;margin-bottom:6px}
+.bar{height:14px;background:#d9ecd9;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#9ad8ac,#3fa56b);border-radius:99px;transition:width .35s}
+ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+li{display:flex;gap:6px;align-items:stretch}
+.item{flex:1;display:flex;align-items:center;gap:12px;background:#fff;border:2px dashed var(--line);border-radius:14px;padding:12px 14px;text-align:left;font-size:17px;color:var(--brown-d);transition:background .2s,opacity .2s}
+.item:hover{background:#f4fbf2}
+.chk{flex:none;width:28px;height:28px;border-radius:50%;border:3px solid var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700}
+.item[aria-pressed="true"]{opacity:.65;border-style:solid;border-color:#a9d9b9}
+.item[aria-pressed="true"] .chk{background:#3fa56b;border-color:#3fa56b;animation:pop .25s}
+.item[aria-pressed="true"] .nm{text-decoration:line-through}
+@keyframes pop{50%{transform:scale(1.25)}}
+.nm{flex:1;min-width:0;overflow-wrap:anywhere}
+.badge{flex:none;font-size:11px;font-weight:700;background:var(--blue);color:#fff;padding:3px 8px;border-radius:10px}
+.item.wx{border-style:solid;border-color:var(--blue);background:#f3f9ff}
+.del{flex:none;width:44px;border:2px dashed var(--line);background:#fff;border-radius:14px;font-size:16px}
+.del:hover{background:#ffe9e0}
+.add{display:flex;gap:8px;margin-top:14px}
+.add input{flex:1;min-width:0;font:inherit;font-size:16px;padding:11px 12px;border:2px dashed var(--line);border-radius:12px;background:#fff;color:var(--brown-d)}
+.btn{border:0;border-radius:14px;background:var(--orange);color:#fff;font-weight:700;padding:11px 16px;font-size:16px;box-shadow:0 3px 0 var(--orange-d)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--orange-d)}
+.btn.ghost{background:#d5eed9;color:var(--brown);box-shadow:0 3px 0 #a9cdb3}
+.go{width:100%;margin-top:16px;padding:16px;font-size:19px}
+.go[aria-disabled="true"]{background:#9db8a6;box-shadow:0 3px 0 #7d9886}
+.go.ready{background:var(--green);box-shadow:0 3px 0 #1d6b40;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{transform:scale(1.02)}}
+.msg{margin-top:12px;border-radius:14px;padding:12px 14px;font-size:15px;display:none}
+.msg.show{display:block}
+.msg.warn{background:#f1faee;border:2px solid var(--line);color:var(--brown-d)}
+.msg.ok{background:#e5f6ea;border:2px solid #9ed7b2;color:#1f5a37;font-weight:700;text-align:center;font-size:17px}
+.msg.ok .em{display:block;font-size:38px;animation:bounce .8s 2}
+@keyframes bounce{50%{transform:translateY(-10px)}}
+.tools{display:flex;justify-content:flex-end;margin-top:12px}
+.tools .btn{font-size:14px;padding:8px 14px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body data-w="rain">
+<header>
+  <div class="brand">
+    <div class="logo" aria-hidden="true">🌦️</div>
+    <div><h1 class="serif">Weather Pocket</h1><small data-i18n="tagline"></small></div>
+  </div>
+  <div class="lang" data-demo="lang-switch" role="group" aria-label="Language">
+    <button type="button" data-lang="ja" data-demo="lang-ja">日本語</button>
+    <button type="button" data-lang="en" data-demo="lang-en">EN</button>
+  </div>
+</header>
+
+<main>
+  <section class="side panel" aria-labelledby="hW">
+    <p class="date" id="date"></p>
+    <h2 class="serif" id="hW" data-i18n="weatherQ"></h2>
+    <div class="wrow" id="wrow" role="group" data-i18n-aria="weatherQ"></div>
+    <div class="wcard" data-demo="weather-card">
+      <div class="big" id="wEmoji" aria-hidden="true"></div>
+      <div><b id="wTitle"></b><span class="meta" id="wMeta"></span></div>
+    </div>
+    <p class="tip" id="wTip"></p>
+  </section>
+
+  <section class="panel" aria-labelledby="hL">
+    <h2 class="serif" id="hL" data-i18n="listTitle"></h2>
+    <div class="prog" data-demo="progress">
+      <div class="top"><span id="progText"></span><span id="progCount"></span></div>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="bar"><i id="barFill"></i></div>
+    </div>
+    <ul id="list" data-demo="checklist" style="margin-top:14px"></ul>
+    <form class="add" id="addForm">
+      <input id="addInput" data-demo="add-input" maxlength="30" data-i18n-ph="addPh" data-i18n-aria="addPh" autocomplete="off">
+      <button class="btn" type="submit" data-demo="add-button" data-i18n="addBtn"></button>
+    </form>
+    <button type="button" class="btn go" id="goBtn" data-demo="depart-button" aria-disabled="true"></button>
+    <div class="msg" id="msg" role="status" aria-live="polite" data-demo="message"></div>
+    <div class="tools"><button type="button" class="btn ghost" id="resetBtn" data-demo="reset-button" data-i18n="reset"></button></div>
+  </section>
+</main>
+
+<script>
+const I18N = {
+ja:{
+ title:"Weather Pocket",
+ tagline:"今日の天気に合う持ち物をポケットに",
+ weatherQ:"今日の天気は？",
+ listTitle:"きょうの持ち物 📒",
+ w_sunny:"晴れ",w_cloudy:"くもり",w_rain:"雨",w_cold:"寒い",
+ h_sunny:"今日は晴れです",h_cloudy:"今日はくもりです",h_rain:"今日は雨です",h_cold:"今日はとても寒いです",
+ meta:"気温 {t}℃ ・ 降水確率 {p}%",
+ tip_sunny:"💡 日差しが強め。日焼け止めと水分補給を忘れずに。",
+ tip_cloudy:"💡 空がぐずつきそう。折りたたみ傘があると安心です。",
+ tip_rain:"💡 傘とレインコートを追加しました。靴下の替えもあると快適です。",
+ tip_cold:"💡 冷え込みます。上着と防寒グッズを追加しました。",
+ badge_sunny:"晴れのため追加",badge_cloudy:"くもりのため追加",badge_rain:"雨のため追加",badge_cold:"寒さのため追加",
+ i_key:"鍵",i_wallet:"財布",i_phone:"スマホ",i_pass:"定期券・ICカード",
+ i_sunscreen:"日焼け止め",i_sunglasses:"サングラス",i_bottle:"水筒",
+ i_fold:"折りたたみ傘",
+ i_umbrella:"傘",i_raincoat:"レインコート",i_socks:"替えの靴下",
+ i_jacket:"上着",i_scarf:"マフラー",i_gloves:"手袋",i_warmer:"カイロ",
+ progLeft:"あと{n}つ！",progDone:"全部そろった！",
+ addPh:"持ち物を追加（例：お弁当）",addBtn:"追加",
+ del:"{n}を削除",
+ depart:"出発する！",
+ departMissing:"まだ残っています：{list}",
+ departOk:"いってらっしゃい！ 良い一日を ✨",
+ reset:"チェックをリセット",
+ resetDone:"チェックをリセットしました。",
+ added:"「{n}」を追加しました。",
+ removed:"「{n}」を削除しました。",
+ empty:"持ち物の名前を入力してください。",
+ dup:"その持ち物はすでにあります。",
+ sep:"、"
+},
+en:{
+ title:"Weather Pocket",
+ tagline:"Pack the right things for today's weather",
+ weatherQ:"How's the weather today?",
+ listTitle:"Today's Things 📒",
+ w_sunny:"Sunny",w_cloudy:"Cloudy",w_rain:"Rain",w_cold:"Cold",
+ h_sunny:"It's sunny today",h_cloudy:"It's cloudy today",h_rain:"It's rainy today",h_cold:"It's very cold today",
+ meta:"{t}°C · {p}% chance of rain",
+ tip_sunny:"💡 Strong sun. Don't forget sunscreen and water.",
+ tip_cloudy:"💡 The sky may turn gloomy. A folding umbrella is a safe bet.",
+ tip_rain:"💡 Added an umbrella and a raincoat. Spare socks help too.",
+ tip_cold:"💡 It's chilly. Added a jacket and warm gear.",
+ badge_sunny:"Added for sun",badge_cloudy:"Added for clouds",badge_rain:"Added for rain",badge_cold:"Added for cold",
+ i_key:"Keys",i_wallet:"Wallet",i_phone:"Phone",i_pass:"Commuter pass / IC card",
+ i_sunscreen:"Sunscreen",i_sunglasses:"Sunglasses",i_bottle:"Water bottle",
+ i_fold:"Folding umbrella",
+ i_umbrella:"Umbrella",i_raincoat:"Raincoat",i_socks:"Spare socks",
+ i_jacket:"Jacket",i_scarf:"Scarf",i_gloves:"Gloves",i_warmer:"Hand warmer",
+ progLeft:"{n} left!",progDone:"All packed!",
+ addPh:"Add an item (e.g. lunch box)",addBtn:"Add",
+ del:"Delete {n}",
+ depart:"I'm heading out!",
+ departMissing:"Still missing: {list}",
+ departOk:"Have a great day! ✨",
+ reset:"Reset checks",
+ resetDone:"Checks have been reset.",
+ added:"Added “{n}”.",
+ removed:"Removed “{n}”.",
+ empty:"Please type an item name.",
+ dup:"That item is already on the list.",
+ sep:", "
+}};
+
+const WEATHER={
+ sunny:{e:"☀️",t:26,p:10,items:[["sunscreen","🧴"],["sunglasses","🕶️"],["bottle","🥤"]]},
+ cloudy:{e:"☁️",t:20,p:40,items:[["fold","🌂"]]},
+ rain:{e:"🌧️",t:17,p:80,items:[["umbrella","☂️"],["raincoat","🧥"],["socks","🧦"]]},
+ cold:{e:"❄️",t:3,p:20,items:[["jacket","🧥"],["scarf","🧣"],["gloves","🧤"],["warmer","🔥"]]}
+};
+const BASE=[["key","🔑"],["wallet","👛"],["phone","📱"],["pass","🎫"]];
+
+let lang="en";
+try{
+  if(window.APP_LANG==="ja"||window.APP_LANG==="en") lang=window.APP_LANG;
+  else{
+    const q=new URLSearchParams(location.search).get("lang");
+    if(q==="ja"||q==="en") lang=q;
+    else{ let s=null; try{s=localStorage.getItem("lang")}catch(e){} if(s==="ja"||s==="en") lang=s; }
+  }
+}catch(e){}
+
+const todayKey=()=>{const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()};
+let state={weather:"rain",checked:{},custom:[],date:todayKey()};
+try{
+  const raw=localStorage.getItem("wpocket");
+  if(raw){const s=JSON.parse(raw);
+    if(s&&typeof s==="object"){
+      if(WEATHER[s.weather]) state.weather=s.weather;
+      if(Array.isArray(s.custom)) state.custom=s.custom.filter(c=>c&&typeof c.name==="string").slice(0,30);
+      if(s.date===todayKey()&&s.checked&&typeof s.checked==="object") state.checked=s.checked;
+    }}
+}catch(e){}
+function save(){try{localStorage.setItem("wpocket",JSON.stringify(state))}catch(e){}}
+
+function t(k,v){let s=(I18N[lang]&&I18N[lang][k]);if(s===undefined)s=k;
+  if(v) for(const x in v) s=s.split("{"+x+"}").join(v[x]); return s;}
+const $=id=>document.getElementById(id);
+
+function visibleItems(){
+  const out=[];
+  BASE.forEach(([id,e])=>out.push({id,e,name:t("i_"+id),kind:"base"}));
+  WEATHER[state.weather].items.forEach(([id,e])=>out.push({id,e,name:t("i_"+id),kind:"wx"}));
+  state.custom.forEach(c=>out.push({id:c.id,e:"📌",name:c.name,kind:"custom"}));
+  return out;
+}
+
+let msgState=null; // {type:'missing'|'ok'|'text', ...}
+function setMsg(type,text){msgState={type,text};renderMsg();}
+function clearMsg(){msgState=null;renderMsg();}
+function renderMsg(){
+  const m=$("msg");
+  if(!msgState){m.className="msg";m.textContent="";return;}
+  m.textContent="";
+  if(msgState.type==="ok"){
+    m.className="msg show ok";
+    const em=document.createElement("span");em.className="em";em.textContent="🎉";m.appendChild(em);
+    m.appendChild(document.createTextNode(t("departOk")));
+  }else if(msgState.type==="missing"){
+    m.className="msg show warn";
+    const names=visibleItems().filter(i=>!state.checked[i.id]).map(i=>i.e+" "+i.name);
+    m.textContent="👀 "+t("departMissing",{list:names.join(t("sep"))});
+  }else{
+    m.className="msg show warn";
+    m.textContent=t(msgState.text.k,msgState.text.v);
+  }
+}
+
+function renderWeather(){
+  const w=WEATHER[state.weather];
+  document.body.dataset.w=state.weather;
+  $("wEmoji").textContent=w.e;
+  $("wTitle").textContent=t("h_"+state.weather);
+  $("wMeta").textContent=t("meta",{t:w.t,p:w.p});
+  $("wTip").textContent=t("tip_"+state.weather);
+  const row=$("wrow");row.textContent="";
+  Object.keys(WEATHER).forEach(k=>{
+    const b=document.createElement("button");
+    b.type="button";b.className="wbtn";b.dataset.demo="weather-"+k;
+    b.setAttribute("aria-pressed",String(k===state.weather));
+    b.appendChild(document.createTextNode(WEATHER[k].e));
+    const s=document.createElement("small");s.textContent=t("w_"+k);b.appendChild(s);
+    b.onclick=()=>{state.weather=k;save();clearMsg();renderWeather();renderList();};
+    row.appendChild(b);
+  });
+}
+
+function renderList(){
+  const items=visibleItems();
+  const ul=$("list");ul.textContent="";
+  items.forEach(it=>{
+    const li=document.createElement("li");
+    const b=document.createElement("button");
+    b.type="button";b.className="item"+(it.kind==="wx"?" wx":"");
+    b.dataset.demo="item-"+(it.kind==="custom"?"custom-"+it.id:it.id);
+    b.setAttribute("aria-pressed",String(!!state.checked[it.id]));
+    const c=document.createElement("span");c.className="chk";c.setAttribute("aria-hidden","true");c.textContent=state.checked[it.id]?"✓":"";
+    const n=document.createElement("span");n.className="nm";n.textContent=it.e+" "+it.name;
+    b.appendChild(c);b.appendChild(n);
+    if(it.kind==="wx"){const g=document.createElement("em");g.className="badge";g.style.fontStyle="normal";g.textContent=t("badge_"+state.weather);b.appendChild(g);}
+    b.onclick=()=>{state.checked[it.id]=!state.checked[it.id];save();if(msgState)clearMsg();renderList();};
+    li.appendChild(b);
+    if(it.kind==="custom"){
+      const d=document.createElement("button");d.type="button";d.className="del";d.dataset.demo="delete-custom";
+      d.textContent="🗑️";d.setAttribute("aria-label",t("del",{n:it.name}));
+      d.onclick=()=>{state.custom=state.custom.filter(x=>x.id!==it.id);delete state.checked[it.id];save();setMsg("text",{k:"removed",v:{n:it.name}});renderList();};
+      li.appendChild(d);
+    }
+    ul.appendChild(li);
+  });
+  const done=items.filter(i=>state.checked[i.id]).length,total=items.length,left=total-done;
+  const pct=Math.round(done/total*100);
+  $("progText").textContent=left===0?t("progDone"):t("progLeft",{n:left});
+  $("progCount").textContent=done+" / "+total;
+  $("barFill").style.width=pct+"%";
+  $("bar").setAttribute("aria-valuenow",pct);
+  const g=$("goBtn");g.textContent="🚪 "+t("depart");
+  g.setAttribute("aria-disabled",String(left!==0));
+  g.classList.toggle("ready",left===0);
+}
+
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.title=t("title");
+  document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.querySelectorAll("[data-i18n-ph]").forEach(el=>el.placeholder=t(el.dataset.i18nPh));
+  document.querySelectorAll("[data-i18n-aria]").forEach(el=>el.setAttribute("aria-label",t(el.dataset.i18nAria)));
+  document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===lang)));
+  $("date").textContent=new Date().toLocaleDateString(lang==="ja"?"ja-JP":"en-US",{month:"long",day:"numeric",weekday:"short"});
+  renderWeather();renderList();renderMsg();
+}
+
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{
+  lang=b.dataset.lang;try{localStorage.setItem("lang",lang)}catch(e){}
+  applyLang();
+});
+
+$("goBtn").onclick=()=>{
+  const left=visibleItems().filter(i=>!state.checked[i.id]).length;
+  if(left===0) setMsg("ok"); else setMsg("missing");
+};
+$("resetBtn").onclick=()=>{state.checked={};save();setMsg("text",{k:"resetDone"});renderList();};
+$("addForm").onsubmit=e=>{
+  e.preventDefault();
+  const inp=$("addInput"),name=inp.value.trim();
+  if(!name){setMsg("text",{k:"empty"});return;}
+  if(visibleItems().some(i=>i.name.toLowerCase()===name.toLowerCase())){setMsg("text",{k:"dup"});return;}
+  state.custom.push({id:"c"+Date.now(),name});
+  save();inp.value="";
+  setMsg("text",{k:"added",v:{n:name}});renderList();
+};
+
+applyLang();
+</script>
+</body>
+</html>

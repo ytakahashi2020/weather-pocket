@@ -1,2 +1,19 @@
-# weather-pocket
-天気ボタンで持ち物が変わる、通勤・通学する大人向けの玄関チェックリストアプリ
+# Weather Pocket
+
+
+
+- ▶ **Try it:** https://ytakahashi2020.github.io/weather-pocket/
+
+## About
+
+See the app and [IDEA.md](IDEA.md) (the idea log, in Japanese).
+
+## How it was made
+
+Built by shaping the idea together with AI (Claude) and publishing the AI-written code.
+The full conversation is in [IDEA.md](IDEA.md) (Japanese).
+
+## Files
+
+- `index.html` — the app (a single self-contained file)
+- `IDEA.md` — the idea log
