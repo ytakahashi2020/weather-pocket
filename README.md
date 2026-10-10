@@ -1,38 +1,42 @@
 # Weather Pocket
 
-Pick the weather, and your packing list changes.
+<img src="assets/logo.png" alt="Weather Pocket logo" width="160">
+
+Pick the weather, pack the right things before you leave.
 
 - ▶ **Try it:** https://ytakahashi2020.github.io/weather-pocket/
 - 🎬 **Demo video:** https://ytakahashi2020.github.io/weather-pocket/demo.mp4
+- 🎤 **Pitch video:** https://ytakahashi2020.github.io/weather-pocket/pitch.mp4
+- 📄 **Pitch deck (PDF):** [pitch.pdf](pitch.pdf)
 
 ## About
 
 ### Forgetting things at the door
 
-Many commuters and students notice a forgotten item only when they reach the front door. Weather Pocket helps before you leave.
+Every morning, adults who commute or go to school notice a missing item right at the entrance. It is a small problem, but it happens a lot.
 
+- The hardest moment is at the door: "Oh no, I forgot it!"
+- Weather changes what you need: umbrella, sunscreen, jacket
+- Weather Pocket is an entrance checklist for your morning
 - Made for adults who commute or go to school
-- The worst moment: "Oh no, I forgot it!" at the door
-- Weather changes what you need to carry
-- One simple checklist for your morning routine
 
-### How Weather Pocket works
+### Tap the weather, see your list
 
-Tap a weather button, then check off your things one by one. The list changes with the weather.
+You choose today's weather with one button. The checklist changes to match, so you can check each item before you leave.
 
 - Four weather buttons: Sunny, Cloudy, Rain, Cold
 - Basic items stay: keys, wallet, phone, commuter pass
-- Weather items appear with a blue badge, like an umbrella
-- Add your own items and watch the progress bar fill up
+- Weather items are added with a blue badge, like an umbrella
+- Tap items to check them. A bar shows how many are left
 
-### A calmer morning, step by step
+### A calmer start to your day
 
-Small worries add up every day. A quick check at the door can make your morning feel lighter.
+Weather Pocket helps you leave home with what you need. It has a warm, pastel notebook look that feels friendly.
 
-- Solves a small daily problem, not a big one
-- Warm pastel notebook style feels friendly
+- Less stress in the morning, fewer forgotten things
+- Your list is saved on your device, and you can reset the checks
 - Works in Japanese and English
-- Next idea: more fun extras, still undecided
+- Next idea: add more fun touches to the checklist
 
 ## How it was made
 
@@ -43,3 +47,5 @@ The full conversation is in [IDEA.md](IDEA.md) (Japanese).
 
 - `index.html` — the app (a single self-contained file)
 - `IDEA.md` — the idea log
+- `pitch.pdf` — the pitch deck
+- `assets/logo.png` — the logo
